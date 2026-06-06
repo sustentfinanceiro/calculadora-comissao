@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Comissão — Sustent+agro</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --verde-floresta: #1B3A2F;
+    --verde-medio: #2E7D32;
+    --verde-oliva: #5D7E3F;
+    --off-white: #E8EDE0;
+    --areia: #F5F1E8;
+    --ambar: #F9A825;
+    --text-primary: #1a1a1a;
+    --text-secondary: #666;
+    --border: #e0e0e0;
+    --bg-card: #ffffff;
+    --bg-secondary: #f7f7f5;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--areia);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .wrapper {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .header-band {
+    background: var(--verde-floresta);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .header-brand {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--off-white);
+    letter-spacing: 0.02em;
+  }
+  .header-sub {
+    font-size: 12px;
+    color: var(--verde-oliva);
+    margin-top: 3px;
+  }
+  .header-badge {
+    background: var(--verde-medio);
+    color: var(--off-white);
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    margin-bottom: 12px;
+  }
+
+  .categoria-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .cat-btn {
+    background: var(--bg-secondary);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.15s, background 0.15s;
+    width: 100%;
+  }
+  .cat-btn:hover { border-color: var(--verde-medio); }
+  .cat-btn.active {
+    border-color: var(--verde-medio);
+    background: #edf5ed;
+  }
+  .cat-name {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+  .cat-pct {
+    display: block;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--verde-medio);
+    line-height: 1.1;
+  }
+  .cat-btn.active .cat-pct { color: var(--verde-floresta); }
+  .cat-sub {
+    display: block;
+    font-size: 10px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  .input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+  .input-prefix {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    min-width: 20px;
+  }
+  .input-valor {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .input-valor:focus {
+    border-color: var(--verde-medio);
+    box-shadow: 0 0 0 3px rgba(46,125,50,0.12);
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--verde-medio);
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    transition: background 0.15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { background: var(--verde-floresta); }
+  input[type=range]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--verde-medio);
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+  .slider-val {
+    font-size: 16px;
+    font-weight: 600;
+    min-width: 36px;
+    text-align: right;
+    color: var(--text-primary);
+  }
+  .slider-val.danger { color: #c62828; }
+
+  .alerta {
+    display: none;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #7B5800;
+    background: #FFF8E1;
+    border-left: 3px solid var(--ambar);
+    padding: 8px 12px;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    line-height: 1.5;
+  }
+  .alerta.visible { display: block; }
+  .alerta strong { font-weight: 600; }
+
+  /* RESULTADO — agora 2 colunas centralizadas */
+  .resultado-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .res-card {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 16px 12px;
+    text-align: center;
+  }
+  .res-card.destaque {
+    background: var(--verde-floresta);
+  }
+  .res-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+  .res-card.destaque .res-label { color: var(--verde-oliva); }
+  .res-valor {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.1;
+  }
+  .res-card.destaque .res-valor {
+    color: var(--ambar);
+    font-size: 26px;
+  }
+  .res-pct {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 5px;
+  }
+  .res-card.destaque .res-pct { color: var(--verde-oliva); }
+
+  .nf-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .nf-info .nf-val {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .regras-lista {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .regras-lista li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .regra-dot {
+    min-width: 7px;
+    height: 7px;
+    width: 7px;
+    border-radius: 50%;
+    background: var(--verde-medio);
+    margin-top: 5px;
+  }
+
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 1.5rem;
+    opacity: 0.7;
+  }
+
+  @media (max-width: 420px) {
+    body { padding: 1rem 0.75rem 2rem; }
+    .header-band { padding: 1rem; }
+    .header-brand { font-size: 16px; }
+    .card { padding: 1rem; }
+    .res-valor { font-size: 18px; }
+    .res-card.destaque .res-valor { font-size: 22px; }
+    .cat-pct { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="header-band">
+    <div>
+      <div class="header-brand">Sustent+agro</div>
+      <div class="header-sub">Calculadora de Comissão de Vendas</div>
+    </div>
+    <div class="header-badge">Uso interno</div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">1. Minha categoria</div>
+    <div class="categoria-grid">
+      <button class="cat-btn" id="btn-junior" onclick="setCategoria('junior')">
+        <span class="cat-name">Júnior</span>
+        <span class="cat-pct" id="pct-jr">0,50%</span>
+        <span class="cat-sub">da nota fiscal</span>
+      </button>
+      <button class="cat-btn active" id="btn-pleno" onclick="setCategoria('pleno')">
+        <span class="cat-name">Pleno</span>
+        <span class="cat-pct" id="pct-pl">1,00%</span>
+        <span class="cat-sub">da nota fiscal</span>
+      </button>
+      <button class="cat-btn" id="btn-senior" onclick="setCategoria('senior')">
+        <span class="cat-name">Sênior</span>
+        <span class="cat-pct" id="pct-sn">1,50%</span>
+        <span class="cat-sub">da nota fiscal</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">2. Valor da nota fiscal</div>
+    <div class="input-group">
+      <span class="input-prefix">R$</span>
+      <input class="input-valor" type="text" id="valor-nf" value="500.000"
+        oninput="calcular()" onblur="formatarInput()" inputmode="numeric" placeholder="0"/>
+    </div>
+
+    <div class="section-label">3. Desconto concedido</div>
+    <div class="slider-row">
+      <input type="range" min="0" max="12" step="1" value="0"
+        id="slider-desconto" oninput="calcular()"/>
+      <span class="slider-val" id="txt-desconto">0%</span>
+    </div>
+    <div class="alerta" id="alerta-desconto">
+      <strong>Aprovação necessária</strong> — desconto acima de 8% exige autorização de José João. Prazo: até 3 dias corridos.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Minha comissão</div>
+    <div class="resultado-grid">
+      <div class="res-card destaque">
+        <div class="res-label">Valor a receber</div>
+        <div class="res-valor" id="res-vendedor">R$ 5.000</div>
+        <div class="res-pct" id="res-pct-vendedor">1,00% da NF</div>
+      </div>
+      <div class="res-card">
+        <div class="res-label">NF com desconto</div>
+        <div class="res-valor" id="nf-com-desconto">R$ 500.000</div>
+        <div class="res-pct" id="res-pct-desconto">Base de cálculo</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Regras de pagamento</div>
+    <ul class="regras-lista">
+      <li><div class="regra-dot"></div><span>Comissão paga somente após recebimento da parcela pela Sustent+agro</span></li>
+      <li><div class="regra-dot"></div><span>Financiamento FINEP: tratado como pagamento à vista — comissão paga integralmente na liberação do crédito</span></li>
+      <li><div class="regra-dot"></div><span>Inadimplência do cliente: comissão suspensa até regularização. O direito não expira.</span></li>
+      <li><div class="regra-dot"></div><span>Cancelamento da venda: comissão não é devida</span></li>
+      <li><div class="regra-dot"></div><span>Desconto acima de 8%: necessária aprovação prévia de José João (3 dias corridos)</span></li>
+    </ul>
+  </div>
+
+  <div class="footer">Sustent+agro · Política Comercial v1.0 · Junho/2026 · Documento interno</div>
+
+</div>
+
+<script>
+  const categorias = {
+    junior: { vendedor: 0.005 },
+    pleno:  { vendedor: 0.010 },
+    senior: { vendedor: 0.015 },
+  };
+
+  let catAtual = 'pleno';
+
+  function setCategoria(cat) {
+    catAtual = cat;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-' + cat).classList.add('active');
+    calcular();
+  }
+
+  function parseValor(str) {
+    return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
+  }
+
+  function formatBRL(val) {
+    return 'R$ ' + Math.round(val).toLocaleString('pt-BR');
+  }
+
+  function formatarPct(val) {
+    return (val * 100).toFixed(2).replace('.', ',') + '%';
+  }
+
+  function formatarInput() {
+    const el = document.getElementById('valor-nf');
+    const val = parseValor(el.value);
+    if (val > 0) el.value = Math.round(val).toLocaleString('pt-BR');
+  }
+
+  function calcPctVendedor(cat, desconto) {
+    return Math.max(categorias[cat].vendedor - (desconto * 0.002), 0);
+  }
+
+  function calcular() {
+    const nfBruto = parseValor(document.getElementById('valor-nf').value);
+    const desconto = parseInt(document.getElementById('slider-desconto').value);
+
+    const txtDesconto = document.getElementById('txt-desconto');
+    txtDesconto.textContent = desconto + '%';
+    txtDesconto.className = 'slider-val' + (desconto > 8 ? ' danger' : '');
+
+    document.getElementById('alerta-desconto').classList.toggle('visible', desconto > 8);
+
+    const nfLiquida = nfBruto * (1 - desconto / 100);
+    const pctVendedor = calcPctVendedor(catAtual, desconto);
+    const comVendedor = nfLiquida * pctVendedor;
+
+    document.getElementById('res-vendedor').textContent     = formatBRL(comVendedor);
+    document.getElementById('res-pct-vendedor').textContent = formatarPct(pctVendedor) + ' da NF';
+    document.getElementById('nf-com-desconto').textContent  = formatBRL(nfLiquida);
+    document.getElementById('res-pct-desconto').textContent = desconto > 0 ? desconto + '% de desconto aplicado' : 'Sem desconto';
+
+    document.getElementById('pct-jr').textContent = formatarPct(calcPctVendedor('junior', desconto));
+    document.getElementById('pct-pl').textContent = formatarPct(calcPctVendedor('pleno',  desconto));
+    document.getElementById('pct-sn').textContent = formatarPct(calcPctVendedor('senior', desconto));
+  }
+
+  calcular();
+</script>
+</body>
+</html>
